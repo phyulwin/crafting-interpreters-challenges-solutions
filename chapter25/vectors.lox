@@ -1,0 +1,49 @@
+// Assignment Submission Notice
+// ----------------------------
+// This file implements Challenge 3 (Closures) from "Crafting Interpreters".
+//
+// The program models 2D vectors using closures to simulate object-like behavior.
+// Each vector is represented as a function that captures its own state (x, y)
+// and exposes methods through a dispatcher.
+//
+// Features:
+// - Constructor: makeVector(x, y)
+// - Accessors: "x", "y"
+// - Method: "add" for vector addition
+//
+// This implementation is for academic submission purposes only.
+// It demonstrates closure-based design and is not intended for production use.
+
+fun makeVector(x, y) {
+  fun getX() { return x; }
+  fun getY() { return y; }
+
+  fun add(other) {
+    return makeVector(x + other("x"), y + other("y"));
+  }
+
+  // Dispatcher (acts like object with methods)
+  fun dispatch(method) {
+    if (method == "x") return getX();
+    if (method == "y") return getY();
+    if (method == "add") return add;
+  }
+
+  return dispatch;
+}
+
+// Create vectors
+var a = makeVector(1, 2);
+var b = makeVector(3, 4);
+
+// Access values
+print a("x"); // 1
+print a("y"); // 2
+print b("x"); // 3
+print b("y"); // 4
+
+// Add vectors
+var c = a("add")(b);
+
+print c("x"); // 4
+print c("y"); // 6
