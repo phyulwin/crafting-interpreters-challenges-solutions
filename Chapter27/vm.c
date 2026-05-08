@@ -31,6 +31,92 @@ static Value clockNative(int argCount, Value* args) {
   return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
 //< Calls and Functions clock-native
+
+// ==============================
+// Chapter 27 Challenge 1
+// Added native function: hasField()
+// Checks whether an instance contains a field.
+// ==============================
+
+static Value hasFieldNative(int argCount, Value* args) {
+  if (argCount != 2) return FALSE_VAL;
+  if (!IS_INSTANCE(args[0])) return FALSE_VAL;
+  if (!IS_STRING(args[1])) return FALSE_VAL;
+
+  ObjInstance* instance = AS_INSTANCE(args[0]);
+
+  Value dummy;
+
+  return BOOL_VAL(
+      tableGet(&instance->fields,
+               AS_STRING(args[1]),
+               &dummy));
+}
+
+// ==============================
+// Chapter 27 Challenge 2
+// Added native function: getField()
+// Dynamically retrieves a field using a string.
+// ==============================
+
+static Value getFieldNative(int argCount, Value* args) {
+  if (argCount != 2) return NIL_VAL;
+  if (!IS_INSTANCE(args[0])) return NIL_VAL;
+  if (!IS_STRING(args[1])) return NIL_VAL;
+
+  ObjInstance* instance = AS_INSTANCE(args[0]);
+
+  Value value;
+
+  if (!tableGet(&instance->fields,
+                AS_STRING(args[1]),
+                &value)) {
+    return NIL_VAL;
+  }
+
+  return value;
+}
+
+// ==============================
+// Chapter 27 Challenge 2
+// Added native function: setField()
+// Dynamically assigns a field using a string.
+// ==============================
+
+static Value setFieldNative(int argCount, Value* args) {
+  if (argCount != 3) return NIL_VAL;
+  if (!IS_INSTANCE(args[0])) return NIL_VAL;
+  if (!IS_STRING(args[1])) return NIL_VAL;
+
+  ObjInstance* instance = AS_INSTANCE(args[0]);
+
+  tableSet(&instance->fields,
+           AS_STRING(args[1]),
+           args[2]);
+
+  return args[2];
+}
+
+// ==============================
+// Chapter 27 Challenge 3
+// Added native function: deleteField()
+// Removes a field from an instance.
+// ==============================
+
+static Value deleteFieldNative(int argCount, Value* args) {
+  if (argCount != 2) return NIL_VAL;
+  if (!IS_INSTANCE(args[0])) return NIL_VAL;
+  if (!IS_STRING(args[1])) return NIL_VAL;
+
+  ObjInstance* instance = AS_INSTANCE(args[0]);
+
+  tableDelete(&instance->fields,
+              AS_STRING(args[1]));
+
+  return NIL_VAL;
+}
+
+
 //> reset-stack
 static void resetStack() {
   vm.stackTop = vm.stack;
@@ -129,6 +215,28 @@ void initVM() {
 //> Calls and Functions define-native-clock
 
   defineNative("clock", clockNative);
+
+  // ==============================
+  // Chapter 27 Challenge 1
+  // Register hasField()
+  // ==============================
+
+  defineNative("hasField", hasFieldNative);
+
+  // ==============================
+  // Chapter 27 Challenge 2
+  // Register getField() and setField()
+  // ==============================
+
+  defineNative("getField", getFieldNative);
+  defineNative("setField", setFieldNative);
+
+  // ==============================
+  // Chapter 27 Challenge 3
+  // Register deleteField()
+  // ==============================
+
+  defineNative("deleteField", deleteFieldNative);
 //< Calls and Functions define-native-clock
 }
 
